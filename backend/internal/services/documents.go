@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"mime/multipart"
 	"path/filepath"
 
@@ -32,7 +33,7 @@ func (s *DocumentsService) GetDocuments(c *gin.Context) ([]models.Document, erro
 }
 
 // UpdateDocument updates the current document and creates a new DocumentHistory entry
-func (s *DocumentsService) UpdateDocument(c *gin.Context, document models.Document) error {
+func (s *DocumentsService) UpdateDocument(c *gin.Context, ID string, document models.Document) error {
 	// Check if a file is provided in the request
 	file, err := c.FormFile("file")
 	if err == nil {
@@ -45,7 +46,7 @@ func (s *DocumentsService) UpdateDocument(c *gin.Context, document models.Docume
 		document.Path = savePath
 	}
 
-	currentDocument, err := s.documentsRepo.FindByFilter(map[string]interface{}{"ID": document.ID})
+	currentDocument, err := s.documentsRepo.FindByFilter(map[string]interface{}{"id": ID})
 	if err != nil {
 		return err // Return error if the document is not found
 	}
@@ -64,6 +65,7 @@ func (s *DocumentsService) UpdateDocument(c *gin.Context, document models.Docume
 		Name:        document.Name,
 		Description: document.Description,
 		Path:        document.Path,
+		Archived:    document.Archived,
 	}
 
 	// Step 3: Insert the history record
@@ -82,8 +84,10 @@ func (s *DocumentsService) UploadDocument(c *gin.Context, documentID string, fil
 		return err // Return error if the document is not found
 	}
 
+	extension := filepath.Ext(file.Filename)
+
 	// Save the file to a local folder
-	savePath := filepath.Join("uploads", file.Filename)
+	savePath := filepath.Join("uploads", document.Name+"_"+fmt.Sprint(document.Version+1)+extension)
 	if err := c.SaveUploadedFile(file, savePath); err != nil {
 		return err // Return error if saving the file fails
 	}
@@ -105,6 +109,7 @@ func (s *DocumentsService) UploadDocument(c *gin.Context, documentID string, fil
 		Name:        document.Name,
 		Description: document.Description,
 		Path:        document.Path,
+		Archived:    document.Archived,
 	}
 
 	// Step 3: Insert the history record

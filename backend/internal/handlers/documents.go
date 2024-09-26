@@ -34,13 +34,14 @@ func (h *DocumentsHandler) List(c *gin.Context) {
 }
 
 func (h *DocumentsHandler) Update(c *gin.Context) {
+	documentID := c.Param("id")
 	var document models.Document
 	if err := c.ShouldBindJSON(&document); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := h.documentsService.UpdateDocument(c, document)
+	err := h.documentsService.UpdateDocument(c, documentID, document)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

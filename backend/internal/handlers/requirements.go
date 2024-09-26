@@ -30,5 +30,5 @@ func (h *RequirementsHandler) List(c *gin.Context) {
 	}
 
 	// Return the list of playlist names
-	c.JSON(http.StatusOK, gin.H{"requirementss": requirementss})
+	c.JSON(http.StatusOK, gin.H{"requirements": requirementss})
 }

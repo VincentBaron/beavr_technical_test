@@ -5,3 +5,4 @@ backend/configs.yml
 frontend/.env
 csvToSQL.go
 scripts/
+backend/uploads/
