@@ -43,6 +43,21 @@ func (h *DocumentsHandler) CreateVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Version created successfully"})
 }
 
+func (h *DocumentsHandler) Update(c *gin.Context) {
+	documentID := c.Param("id")
+	var document models.Document
+	if err := c.ShouldBindJSON(&document); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err := h.documentsService.UpdateDocument(c, documentID, document)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Document updated successfully"})
+}
+
 func (h *DocumentsHandler) UpdateVersion(c *gin.Context) {
 	documentID := c.Param("id")
 	var document models.DocumentVersions

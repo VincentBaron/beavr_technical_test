@@ -33,6 +33,21 @@ func (s *DocumentsService) GetDocuments(c *gin.Context) ([]models.Document, erro
 	return documents, nil
 }
 
+// UpdateDocument updates the current document and creates a new DocumentHistory entry
+func (s *DocumentsService) UpdateDocument(c *gin.Context, ID string, document models.Document) error {
+	// Get the document by ID
+	documentID, err := strconv.Atoi(ID)
+	if err != nil {
+		return err // Return error if the ID is not a valid integer
+	}
+	document.ID = uint(documentID)
+	// Step 1: Update the current document
+	if err := s.documentsRepo.Save(&document); err != nil {
+		return err // Return error if saving the document fails
+	}
+	return nil
+}
+
 // CreateVersion creates a new version of the document
 func (s *DocumentsService) CreateVersion(c *gin.Context, ID string) error {
 	// Get the document by ID

@@ -4,6 +4,7 @@ import {
   getDocuments,
   uploadFileToDocument,
   patchVersion,
+  patchDocument,
   createVersion as createNewVersion,
 } from "../api/api";
 import { Card } from "../components/ui/card";
@@ -49,19 +50,12 @@ export const DocumentTable: React.FC = () => {
     fetchDocuments();
   }, []);
 
-  const handleStatusChange = async (versionId: number, status: string) => {
-    const document = documents.find((doc) =>
-      doc.Versions.some((version) => version.ID === versionId)
-    );
+  const handleStatusChange = async (documentId: number, status: string) => {
+    const document = documents.find((doc) => doc.ID === documentId);
     if (document) {
-      const version = document.Versions.find(
-        (version) => version.ID === versionId
-      );
-      if (version) {
-        const updatedVersion = { ...version, Status: status };
-        await patchVersion(versionId.toString(), updatedVersion);
-        fetchDocuments();
-      }
+      const updatedDocument = { ...document, Status: status };
+      await patchDocument(documentId.toString(), updatedDocument);
+      fetchDocuments();
     }
   };
 
@@ -117,6 +111,21 @@ export const DocumentTable: React.FC = () => {
         <Card key={doc.ID} className="p-4 shadow-md">
           <h3 className="text-lg font-semibold">{doc.Name}</h3>
           <p>Requirement ID: {doc.RequirementID}</p>
+          <div className="mt-2 flex flex-row">
+            <p>Status:</p>
+            <select
+              id={`status-${doc.ID}`}
+              value={doc.Status}
+              onChange={(e) => handleStatusChange(doc.ID, e.target.value)}
+              className="mb-2"
+            >
+              {statuses.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="mt-4">
             <h3 className="text-lg font-semibold">Document Versions</h3>
             <Button onClick={() => handleCreateVersion(doc.ID)}>
@@ -131,23 +140,6 @@ export const DocumentTable: React.FC = () => {
                   <p>V{version.Version}</p>
                   <p>Created on: {version.CreatedAt}</p>
                   <p>Last updated: {version.UpdatedAt}</p>
-                  <div className="mt-2 flex flex-row">
-                    <p>Status:</p>
-                    <select
-                      id={`status-${version.ID}`}
-                      value={version.Status}
-                      onChange={(e) =>
-                        handleStatusChange(version.ID, e.target.value)
-                      }
-                      className="mb-2"
-                    >
-                      {statuses.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
                   <p>Path: {version.Path}</p>
                   <div className="mt-2">
                     <Button onClick={() => openUploadCard(version.ID)}>

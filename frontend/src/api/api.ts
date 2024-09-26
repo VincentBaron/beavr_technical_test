@@ -7,6 +7,9 @@ const api = axios.create({
 
 export const getRequirements = () => api.get("/requirements");
 export const getDocuments = () => api.get("/documents");
+export const patchDocument = (id: string, data: any) => {
+  return api.patch(`/documents/${id}`, data);
+};
 export const patchVersion = (id: string, data: any) => {
   return api.patch(`/documents/versions/${id}`, data);
 };

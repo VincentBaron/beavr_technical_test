@@ -11,6 +11,7 @@ type Document struct {
 	Description   string `gorm:"type:text"`
 	RequirementID uint   // Foreign key for Requirement
 	Versions      []DocumentVersions
+	Status        Status `gorm:"default:'non-compliant'"` // Status of the document
 }
 
 // DocumentHistory defines the structure for document version history
