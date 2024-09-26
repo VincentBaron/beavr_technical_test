@@ -57,10 +57,15 @@ func (s *DocumentsService) UploadDocument(c *gin.Context, versionID string, file
 		return err // Return error if the document is not found
 	}
 
+	document, err := s.documentsRepo.FindByFilter(map[string]interface{}{"id": version.DocumentID})
+	if err != nil {
+		return err // Return error if the document is not found
+	}
+
 	extension := filepath.Ext(file.Filename)
 
 	// Save the file to a local folder
-	savePath := filepath.Join("uploads", fmt.Sprint(version.DocumentID)+"_"+fmt.Sprint(version.Version+1)+extension)
+	savePath := filepath.Join("uploads", fmt.Sprint(document.Name)+"_"+fmt.Sprint(version.Version+1)+extension)
 	if err := c.SaveUploadedFile(file, savePath); err != nil {
 		return err // Return error if saving the file fails
 	}
