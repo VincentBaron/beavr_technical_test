@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"mime/multipart"
 	"path/filepath"
+	"strconv"
 
 	"github.com/VincentBaron/beavr_technical_test/backend/internal/models"
 	"github.com/VincentBaron/beavr_technical_test/backend/internal/repositories"
@@ -13,19 +14,19 @@ import (
 
 type DocumentsService struct {
 	documentsRepo *repositories.Repository[models.Document]
-	historyRepo   *repositories.Repository[models.DocumentHistory] // Ensure you have a repository for history
+	versionRepo   *repositories.Repository[models.DocumentVersions] // Ensure you have a repository for history
 }
 
-func NewDocumentsService(documentsRepo *repositories.Repository[models.Document], historyRepo *repositories.Repository[models.DocumentHistory]) *DocumentsService {
+func NewDocumentsService(documentsRepo *repositories.Repository[models.Document], versionRepo *repositories.Repository[models.DocumentVersions]) *DocumentsService {
 	return &DocumentsService{
 		documentsRepo: documentsRepo,
-		historyRepo:   historyRepo,
+		versionRepo:   versionRepo,
 	}
 }
 
 // GetDocuments returns a list of documents
 func (s *DocumentsService) GetDocuments(c *gin.Context) ([]models.Document, error) {
-	documents, err := s.documentsRepo.FindAllByFilter(map[string]interface{}{})
+	documents, err := s.documentsRepo.FindAllByFilter(map[string]interface{}{}, "Versions")
 	if err != nil {
 		return nil, err
 	}
@@ -33,43 +34,15 @@ func (s *DocumentsService) GetDocuments(c *gin.Context) ([]models.Document, erro
 }
 
 // UpdateDocument updates the current document and creates a new DocumentHistory entry
-func (s *DocumentsService) UpdateDocument(c *gin.Context, ID string, document models.Document) error {
-	// Check if a file is provided in the request
-	file, err := c.FormFile("file")
-	if err == nil {
-		// Save the file to a local folder
-		savePath := filepath.Join("uploads", file.Filename)
-		if err := c.SaveUploadedFile(file, savePath); err != nil {
-			return err // Return error if saving the file fails
-		}
-		// Update the document's path with the saved file's path
-		document.Path = savePath
-	}
+func (s *DocumentsService) UpdateVersion(c *gin.Context, ID string, version models.DocumentVersions) error {
 
-	currentDocument, err := s.documentsRepo.FindByFilter(map[string]interface{}{"id": ID})
+	versionID, err := strconv.Atoi(ID)
 	if err != nil {
-		return err // Return error if the document is not found
+		return err // Return error if the ID is not a valid integer
 	}
-	document.Version = currentDocument.Version + 1
-
-	// Step 1: Update the document
-	err = s.documentsRepo.Save(&document)
-	if err != nil {
-		return err // Return error if the update fails
-	}
-
-	// Step 2: Create a new DocumentHistory entry
-	historyEntry := models.DocumentHistory{
-		DocumentID:  document.ID,                 // Use the updated document ID
-		Version:     currentDocument.Version + 1, // Function to determine the next version number
-		Name:        document.Name,
-		Description: document.Description,
-		Path:        document.Path,
-		Archived:    document.Archived,
-	}
-
+	version.ID = uint(versionID)
 	// Step 3: Insert the history record
-	if err := s.historyRepo.Save(&historyEntry); err != nil {
+	if err := s.versionRepo.Save(&version); err != nil {
 		return err // Return error if saving history fails
 	}
 
@@ -77,9 +50,9 @@ func (s *DocumentsService) UpdateDocument(c *gin.Context, ID string, document mo
 }
 
 // Upload Document uploads a file and updates the document's path
-func (s *DocumentsService) UploadDocument(c *gin.Context, documentID string, file *multipart.FileHeader) error {
+func (s *DocumentsService) UploadDocument(c *gin.Context, versionID string, file *multipart.FileHeader) error {
 	// Get the document by ID
-	document, err := s.documentsRepo.FindByFilter(map[string]interface{}{"id": documentID})
+	version, err := s.versionRepo.FindByFilter(map[string]interface{}{"id": versionID})
 	if err != nil {
 		return err // Return error if the document is not found
 	}
@@ -87,33 +60,21 @@ func (s *DocumentsService) UploadDocument(c *gin.Context, documentID string, fil
 	extension := filepath.Ext(file.Filename)
 
 	// Save the file to a local folder
-	savePath := filepath.Join("uploads", document.Name+"_"+fmt.Sprint(document.Version+1)+extension)
+	savePath := filepath.Join("uploads", fmt.Sprint(version.DocumentID)+"_"+fmt.Sprint(version.Version+1)+extension)
 	if err := c.SaveUploadedFile(file, savePath); err != nil {
 		return err // Return error if saving the file fails
 	}
 
-	// Update the document's path with the saved file's path
-	document.Path = savePath
-	document.Version = document.Version + 1
-	document.Status = models.Pending
-
-	// Update the document in the database
-	if err := s.documentsRepo.Save(document); err != nil {
-		return err // Return error if updating the document fails
-	}
-
 	// Step 2: Create a new DocumentHistory entry
-	historyEntry := models.DocumentHistory{
-		DocumentID:  document.ID,          // Use the updated document ID
-		Version:     document.Version + 1, // Function to determine the next version number
-		Name:        document.Name,
-		Description: document.Description,
-		Path:        document.Path,
-		Archived:    document.Archived,
+	newVersion := models.DocumentVersions{
+		DocumentID: version.DocumentID,  // Use the updated document ID
+		Version:    version.Version + 1, // Function to determine the next version number
+		Path:       savePath,
+		Archived:   version.Archived,
 	}
 
 	// Step 3: Insert the history record
-	if err := s.historyRepo.Save(&historyEntry); err != nil {
+	if err := s.versionRepo.Save(&newVersion); err != nil {
 		return err // Return error if saving history fails
 	}
 

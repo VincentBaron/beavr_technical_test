@@ -42,7 +42,7 @@ func main() {
 	// Initialize repositories
 	requirementsRepo := repositories.NewRepository[models.Requirement](config.DB)
 	documentsRepo := repositories.NewRepository[models.Document](config.DB)
-	documentsHistoryRepo := repositories.NewRepository[models.DocumentHistory](config.DB)
+	documentsHistoryRepo := repositories.NewRepository[models.DocumentVersions](config.DB)
 
 	// Initialize services
 	requirementsService := services.NewRequirementsService(requirementsRepo)
@@ -55,11 +55,8 @@ func main() {
 	// Set up routes with handlers
 	r.GET("/requirements", requirementsHandler.List)
 	r.GET("/documents", documentsHandler.List)
-	r.PATCH("/documents/:id", documentsHandler.Update)
-	r.PATCH("/documents/:id/upload-file", documentsHandler.UploadFile)
-
-	// r.GET("/status", handler.handleStatus)
-	// r.POST("/store-token", storeTokenHandler)
+	r.PATCH("/documents/versions/:id", documentsHandler.UpdateVersion)
+	r.PATCH("/documents/versions/:id/upload-file", documentsHandler.UploadFile)
 
 	// Start the server
 	log.Printf("Server started at http://localhost:8080...")

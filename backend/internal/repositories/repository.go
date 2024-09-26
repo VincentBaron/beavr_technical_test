@@ -40,7 +40,7 @@ func (r *Repository[T]) FindAllByFilter(filter map[string]interface{}, preload .
 // getNextVersion retrieves the next version number for a given DocumentID
 func getNextVersion(documentID uint, db *gorm.DB) int {
 	var count int64
-	db.Model(&models.DocumentHistory{}).Where("document_id = ?", documentID).Count(&count)
+	db.Model(&models.DocumentVersions{}).Where("document_id = ?", documentID).Count(&count)
 	return int(count) + 1
 }
 

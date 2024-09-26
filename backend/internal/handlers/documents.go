@@ -33,15 +33,15 @@ func (h *DocumentsHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"documents": documents})
 }
 
-func (h *DocumentsHandler) Update(c *gin.Context) {
+func (h *DocumentsHandler) UpdateVersion(c *gin.Context) {
 	documentID := c.Param("id")
-	var document models.Document
+	var document models.DocumentVersions
 	if err := c.ShouldBindJSON(&document); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := h.documentsService.UpdateDocument(c, documentID, document)
+	err := h.documentsService.UpdateVersion(c, documentID, document)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
