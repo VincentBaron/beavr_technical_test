@@ -1,0 +1,5 @@
+node_modules
+backend/vendor
+backend/configs.yml
+backend/.vscode/launch.json
+frontend/.env
