@@ -18,7 +18,7 @@ const App: React.FC = () => {
         <Sidebar />
 
         {/* Main content area */}
-        <main className="flex-1 p-6 bg-gray-100">
+        <main className="flex-1 p-6 bg-gray-100 ml-64">
           <Routes>
             {/* Default route redirects to the requirements page */}
             <Route path="/" element={<Navigate to="/requirements" />} />

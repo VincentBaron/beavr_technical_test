@@ -7,8 +7,11 @@ export const Sidebar: React.FC = () => {
   const location = useLocation();
 
   return (
-    <aside className="h-screen w-64 bg-green-900 text-white p-6">
-      <h2 className="text-xl font-semibold mb-4">Kit</h2>
+    <aside className="fixed h-screen w-64 bg-green-900 text-white p-6">
+      <h2 className="text-xl font-semibold mb-4 flex items-center">
+        {" "}
+        🦫 | Kit
+      </h2>
       <nav className="flex flex-col space-y-4">
         <Button
           variant="ghost"

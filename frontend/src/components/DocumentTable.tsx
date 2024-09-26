@@ -31,7 +31,7 @@ interface DocumentVersion {
   UpdatedAt: string;
 }
 
-const statuses = ["compliant", "non-compliant", "pending"];
+const statuses = ["compliant", "non-compliant"];
 
 export const DocumentTable: React.FC = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -111,13 +111,15 @@ export const DocumentTable: React.FC = () => {
         <Card key={doc.ID} className="p-4 shadow-md">
           <h3 className="text-lg font-semibold">{doc.Name}</h3>
           <p>Requirement ID: {doc.RequirementID}</p>
-          <div className="mt-2 flex flex-row">
-            <p>Status:</p>
+          <div className="mt-2 flex flex-row items-center">
             <select
               id={`status-${doc.ID}`}
               value={doc.Status}
               onChange={(e) => handleStatusChange(doc.ID, e.target.value)}
-              className="mb-2"
+              className="mb-2 ml-2"
+              style={{
+                color: doc.Status === "compliant" ? "green" : "red",
+              }}
             >
               {statuses.map((status) => (
                 <option key={status} value={status}>
