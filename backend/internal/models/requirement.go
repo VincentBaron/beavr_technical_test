@@ -16,5 +16,5 @@ type Requirement struct {
 	Name        string `gorm:"not null"`
 	Description string `gorm:"type:text"`
 	Status      Status `gorm:"default:'non-compliant'"` // 'compliant', 'non-compliant', 'pending'
-	// Documents   []Document
+	Documents   []Document
 }
