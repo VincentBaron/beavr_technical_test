@@ -3,3 +3,5 @@ backend/vendor
 backend/configs.yml
 .vscode/launch.json
 frontend/.env
+csvToSQL.go
+scripts/

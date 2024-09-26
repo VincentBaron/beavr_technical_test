@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"github.com/VincentBaron/beavr_technical_test/backend/internal/models"
 	"gorm.io/gorm"
 )
 
@@ -34,6 +35,13 @@ func (r *Repository[T]) FindAllByFilter(filter map[string]interface{}, preload .
 		return nil, err
 	}
 	return entities, nil
+}
+
+// getNextVersion retrieves the next version number for a given DocumentID
+func getNextVersion(documentID uint, db *gorm.DB) int {
+	var count int64
+	db.Model(&models.DocumentHistory{}).Where("document_id = ?", documentID).Count(&count)
+	return int(count) + 1
 }
 
 func (r *Repository[T]) Save(entity *T) error {
