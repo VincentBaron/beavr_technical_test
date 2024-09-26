@@ -1,6 +1,11 @@
 // src/components/DocumentTable.tsx
 import React, { useEffect, useState } from "react";
-import { getDocuments, uploadFileToDocument, patchVersion } from "../api/api";
+import {
+  getDocuments,
+  uploadFileToDocument,
+  patchVersion,
+  createVersion as createNewVersion,
+} from "../api/api";
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 
@@ -16,12 +21,13 @@ interface Document {
 
 interface DocumentVersion {
   ID: number;
-  CreatedAt: string;
-  UpdatedAt: string;
   DocumentID: number;
   Version: string;
   Path: string;
   Status: string;
+  Archived: boolean;
+  CreatedAt: string;
+  UpdatedAt: string;
 }
 
 const statuses = ["compliant", "non-compliant", "pending"];
@@ -100,6 +106,11 @@ export const DocumentTable: React.FC = () => {
     }));
   };
 
+  const handleCreateVersion = async (docId: number) => {
+    await createNewVersion(docId.toString());
+    fetchDocuments();
+  };
+
   return (
     <div className="grid grid-cols-1 gap-4">
       {documents.map((doc) => (
@@ -108,7 +119,11 @@ export const DocumentTable: React.FC = () => {
           <p>Requirement ID: {doc.RequirementID}</p>
           <div className="mt-4">
             <h3 className="text-lg font-semibold">Document Versions</h3>
-            {doc.Versions.slice()
+            <Button onClick={() => handleCreateVersion(doc.ID)}>
+              Create Version
+            </Button>
+            {doc.Versions.filter((version) => !version.Archived)
+              .slice()
               .reverse()
               .slice(0, showAllVersions[doc.ID] ? undefined : 1)
               .map((version) => (

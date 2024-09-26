@@ -33,6 +33,24 @@ func (s *DocumentsService) GetDocuments(c *gin.Context) ([]models.Document, erro
 	return documents, nil
 }
 
+// CreateVersion creates a new version of the document
+func (s *DocumentsService) CreateVersion(c *gin.Context, ID string) error {
+	// Get the document by ID
+	document, err := s.documentsRepo.FindByFilter(map[string]interface{}{"id": ID}, "Versions")
+	if err != nil {
+		return err // Return error if the document is not found
+	}
+	version := models.DocumentVersions{
+		DocumentID: document.ID, // Use the updated document ID
+		Version:    len(document.Versions) + 1,
+	}
+	// Step 2: Insert the history record
+	if err := s.versionRepo.Save(&version); err != nil {
+		return err // Return error if saving history fails
+	}
+	return nil
+}
+
 // UpdateDocument updates the current document and creates a new DocumentHistory entry
 func (s *DocumentsService) UpdateVersion(c *gin.Context, ID string, version models.DocumentVersions) error {
 

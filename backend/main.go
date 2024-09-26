@@ -55,6 +55,7 @@ func main() {
 	// Set up routes with handlers
 	r.GET("/requirements", requirementsHandler.List)
 	r.GET("/documents", documentsHandler.List)
+	r.POST("/documents/:id/versions", documentsHandler.CreateVersion)
 	r.PATCH("/documents/versions/:id", documentsHandler.UpdateVersion)
 	r.PATCH("/documents/versions/:id/upload-file", documentsHandler.UploadFile)
 

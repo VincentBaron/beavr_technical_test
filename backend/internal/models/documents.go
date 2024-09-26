@@ -18,6 +18,7 @@ type DocumentVersions struct {
 	gorm.Model
 	DocumentID uint   // Foreign key for the current Document
 	Version    int    // Version number
-	Path       string `gorm:"not null"` // Path to the stored document
+	Status     Status `gorm:"default:'non-compliant'"` // Status of the document
+	Path       string `gorm:"not null"`                // Path to the stored document
 	Archived   bool   `gorm:"default:false"`
 }

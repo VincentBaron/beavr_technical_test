@@ -8,7 +8,7 @@ const api = axios.create({
 export const getRequirements = () => api.get("/requirements");
 export const getDocuments = () => api.get("/documents");
 export const patchVersion = (id: string, data: any) => {
-  return api.patch(`/documents/versions${id}`, data);
+  return api.patch(`/documents/versions/${id}`, data);
 };
 export const uploadFileToDocument = (id: string, file: File) => {
   const formData = new FormData();
@@ -19,4 +19,7 @@ export const uploadFileToDocument = (id: string, file: File) => {
       "Content-Type": "multipart/form-data",
     },
   });
+};
+export const createVersion = async (docId: string) => {
+  return await api.post(`/documents/${docId}/versions`);
 };
