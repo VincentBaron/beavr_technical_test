@@ -13,13 +13,16 @@ import (
 
 var DB *gorm.DB
 
+var DB_URL string
+
 func ConnectToDb() {
 	var err error
-	host := Conf.Database.Host
-	port := Conf.Database.Port
-	user := Conf.Database.User
-	password := Conf.Database.Password
-	database := Conf.Database.Name
+	// host := Conf.Database.Host
+	// port := Conf.Database.Port
+	// user := Conf.Database.User
+	// password := Conf.Database.Password
+	// database := Conf.Database.Name
+	flyURI := os.Getenv("DATABASE_URL")
 
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
@@ -32,7 +35,7 @@ func ConnectToDb() {
 	)
 
 	// Connect to postgres
-	dsn := fmt.Sprintf("host=%s port=%s, user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, database)
+	dsn := fmt.Sprintf("%s", flyURI)
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: newLogger,
 	})
