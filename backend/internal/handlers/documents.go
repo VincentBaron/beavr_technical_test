@@ -19,17 +19,21 @@ func NewDocumentsHandler(documentsService *services.DocumentsService) *Documents
 }
 
 func (h *DocumentsHandler) List(c *gin.Context) {
+	var params models.GetDocumentsParams
 
-	// Create a new slice to store the playlist names
-	var documents []models.Document
+	// Bind query parameters to the GetDocumentsParams struct
+	if err := c.ShouldBindQuery(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters"})
+		return
+	}
 
-	documents, err := h.documentsService.GetDocuments(c)
+	documents, err := h.documentsService.GetDocuments(c, &params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Return the list of playlist names
+	// Return the list of documents
 	c.JSON(http.StatusOK, gin.H{"documents": documents})
 }
 

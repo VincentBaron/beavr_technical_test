@@ -14,6 +14,10 @@ type Document struct {
 	Status        Status `gorm:"default:'non-compliant'"` // Status of the document
 }
 
+type GetDocumentsParams struct {
+	RequirementID *uint
+}
+
 // DocumentHistory defines the structure for document version history
 type DocumentVersions struct {
 	gorm.Model

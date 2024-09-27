@@ -6,7 +6,13 @@ const api = axios.create({
 });
 
 export const getRequirements = () => api.get("/requirements");
-export const getDocuments = () => api.get("/documents");
+export const getDocuments = async (params?: { ReferenceId?: number }) => {
+  if (params) {
+    return await api.get("/documents", { params });
+  } else {
+    return await api.get("/documents");
+  }
+};
 export const patchDocument = (id: string, data: any) => {
   return api.patch(`/documents/${id}`, data);
 };

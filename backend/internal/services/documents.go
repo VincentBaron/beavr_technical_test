@@ -25,9 +25,19 @@ func NewDocumentsService(documentsRepo *repositories.Repository[models.Document]
 }
 
 // GetDocuments returns a list of documents
-func (s *DocumentsService) GetDocuments(c *gin.Context) ([]models.Document, error) {
-	documents, err := s.documentsRepo.FindAllByFilter(map[string]interface{}{}, "Versions")
+func (s *DocumentsService) GetDocuments(c *gin.Context, params *models.GetDocumentsParams) ([]models.Document, error) {
+	var filter map[string]interface{}
+	if params != nil && params.RequirementID != nil {
+		filter = map[string]interface{}{
+			"requirement_id": *params.RequirementID,
+		}
+	} else {
+		filter = map[string]interface{}{}
+	}
+
+	documents, err := s.documentsRepo.FindAllByFilter(filter, "Versions")
 	if err != nil {
+		// handle error
 		return nil, err
 	}
 	return documents, nil
