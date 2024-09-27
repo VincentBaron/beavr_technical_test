@@ -1,0 +1,18 @@
+{
+  "name": "kitfrontend",
+  "scripts": {
+    "postdeploy": "cd frontend && npm install && npm run build"
+  },
+  "env": {
+    "NPM_CONFIG_PRODUCTION": {
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "addons": []
+}
