@@ -52,7 +52,7 @@ export const DocumentTable: React.FC = () => {
     const sortedDocs = response.data.documents.sort(
       (a: Document, b: Document) => a.RequirementID - b.RequirementID
     );
-    sortedDocs.slice(0, 3).forEach((doc: Document) => {
+    sortedDocs.slice(0, 1).forEach((doc: Document) => {
       initialShowDocuments[doc.RequirementID] = true;
     });
     setShowDocuments(initialShowDocuments);
