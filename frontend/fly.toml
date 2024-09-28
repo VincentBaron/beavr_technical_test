@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for frontend-blue-silence-594 on 2024-09-28T12:12:18+02:00
+# fly.toml app configuration file generated for frontend-blue-silence-594 on 2024-09-28T14:19:22+02:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -8,29 +8,6 @@ primary_region = 'cdg'
 
 [build]
 
-[[services]]
-  internal_port = 80
-  protocol = "tcp"
-
-  [[services.ports]]
-    handlers = ["http"]
-    port = 80
-
-  [[services.ports]]
-    handlers = ["tls", "http"]
-    port = 443
-
-  [[services.http_checks]]
-    interval = 10000
-    method = "get"
-    path = "/"
-    protocol = "http"
-    timeout = 2000
-    tls_skip_verify = false
-  [[services.tcp_checks]]
-    interval = 10000
-    timeout = 2000
-
 [http_service]
   internal_port = 80
   force_https = true
@@ -38,6 +15,10 @@ primary_region = 'cdg'
   auto_start_machines = true
   min_machines_running = 0
   processes = ['app']
+
+[[services]]
+  http_checks = []
+  internal_port = 8080
 
 [[vm]]
   memory = '1gb'

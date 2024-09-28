@@ -34,11 +34,12 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 
-# Final stage for app image
-FROM nginx
-
-# Copy built application
+# Stage 1, based on NGINX to provide a configuration to be used with react-router
+FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/conf.d
+
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 80
