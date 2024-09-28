@@ -61,8 +61,6 @@ func main() {
 	r.PATCH("/documents/versions/:id/upload-file", documentsHandler.UploadFile)
 
 	// Start the server
-	log.Println("Starting server on :8080")
-	if err := http.ListenAndServe("0.0.0.0:8080", nil); err != nil {
-		log.Fatalf("Error starting server: %s", err)
-	}
+	log.Println("listening on", "8080")
+	log.Fatal(http.ListenAndServe(":"+"8080", nil))
 }
