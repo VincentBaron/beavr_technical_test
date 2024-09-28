@@ -35,7 +35,7 @@ func main() {
 	// Set up the Gin router
 	r := gin.New()
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"http://localhost:5173"}
+	corsConfig.AllowAllOrigins = true
 
 	r.Use(cors.New(corsConfig))
 
