@@ -35,7 +35,10 @@ func main() {
 	// Set up the Gin router
 	r := gin.New()
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowAllOrigins = true
+	corsConfig.AllowOrigins = []string{"https://frontend-blue-silence-594.fly.dev"}
+	corsConfig.AllowCredentials = true
+	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
+	corsConfig.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 
 	r.Use(cors.New(corsConfig))
 
