@@ -14,6 +14,6 @@ type Requirement struct {
 	gorm.Model
 	Name        string `gorm:"not null"`
 	Description string `gorm:"type:text"`
-	Status      Status `gorm:"-"` // Status of the requirement
+	Status      Status `gorm:"-"`
 	Documents   []Document
 }

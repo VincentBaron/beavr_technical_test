@@ -18,17 +18,16 @@ func NewRequirementsHandler(requirementsService *services.RequirementsService) *
 	}
 }
 
+// List returns a list of requirements
 func (h *RequirementsHandler) List(c *gin.Context) {
+	var requirements []models.Requirement
 
-	// Create a new slice to store the playlist names
-	var requirementss []models.Requirement
-
-	requirementss, err := h.requirementsService.GetRequirements(c)
+	requirements, err := h.requirementsService.GetRequirements(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Return the list of playlist names
-	c.JSON(http.StatusOK, gin.H{"requirements": requirementss})
+	c.JSON(http.StatusOK, gin.H{"requirements": requirements})
 }

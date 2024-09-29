@@ -13,29 +13,22 @@ import (
 
 var DB *gorm.DB
 
-var DB_URL string
-
 func ConnectToDb() {
 	var err error
-	// host := Conf.Database.Host
-	// port := Conf.Database.Port
-	// user := Conf.Database.User
-	// password := Conf.Database.Password
-	// database := Conf.Database.Name
-	flyURI := os.Getenv("DATABASE_URL")
+	DBURI := os.Getenv("DATABASE_URL")
 
 	newLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
-			SlowThreshold:             time.Second, // Slow SQL threshold
-			LogLevel:                  logger.Info, // Log level
-			IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
-			Colorful:                  true,        // Disable color
+			SlowThreshold:             time.Second,
+			LogLevel:                  logger.Info,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  true,
 		},
 	)
 
 	// Connect to postgres
-	dsn := fmt.Sprintf("%s", flyURI)
+	dsn := fmt.Sprintf("%s", DBURI)
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: newLogger,
 	})

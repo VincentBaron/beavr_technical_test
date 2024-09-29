@@ -16,6 +16,7 @@ func NewRequirementsService(requirementsRepo *repositories.Repository[models.Req
 	}
 }
 
+// GetRequirements returns a list of requirements
 func (s *RequirementsService) GetRequirements(c *gin.Context) ([]models.Requirement, error) {
 	requirements, err := s.requirementsRepository.FindAllByFilter(map[string]interface{}{}, "Documents")
 	if err != nil {
@@ -36,6 +37,5 @@ func (s *RequirementsService) GetRequirements(c *gin.Context) ([]models.Requirem
 			requirements[i].Status = "non-compliant"
 		}
 	}
-
 	return requirements, nil
 }

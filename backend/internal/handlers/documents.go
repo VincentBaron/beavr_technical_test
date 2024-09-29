@@ -18,6 +18,7 @@ func NewDocumentsHandler(documentsService *services.DocumentsService) *Documents
 	}
 }
 
+// List returns a list of documents
 func (h *DocumentsHandler) List(c *gin.Context) {
 	var params models.GetDocumentsParams
 
@@ -37,6 +38,7 @@ func (h *DocumentsHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"documents": documents})
 }
 
+// CreateVersion creates a new version of a document
 func (h *DocumentsHandler) CreateVersion(c *gin.Context) {
 	documentID := c.Param("id")
 	err := h.documentsService.CreateVersion(c, documentID)
@@ -47,6 +49,7 @@ func (h *DocumentsHandler) CreateVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Version created successfully"})
 }
 
+// Update updates general infors of a document
 func (h *DocumentsHandler) Update(c *gin.Context) {
 	documentID := c.Param("id")
 	var document models.Document
@@ -62,6 +65,7 @@ func (h *DocumentsHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Document updated successfully"})
 }
 
+// UpdateVersion updates a document version
 func (h *DocumentsHandler) UpdateVersion(c *gin.Context) {
 	documentID := c.Param("id")
 	var document models.DocumentVersions
@@ -79,9 +83,8 @@ func (h *DocumentsHandler) UpdateVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Document updated successfully"})
 }
 
-// UploadFile handles file uploads and updates the document's path
+// UploadFile handles file uploads to a document version and updates the document's path
 func (h *DocumentsHandler) UploadFile(c *gin.Context) {
-	// Get the document ID from the endpoint path
 	documentID := c.Param("id")
 
 	// Parse the file from the request

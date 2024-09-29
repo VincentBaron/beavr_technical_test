@@ -14,7 +14,7 @@ import (
 
 type DocumentsService struct {
 	documentsRepo *repositories.Repository[models.Document]
-	versionRepo   *repositories.Repository[models.DocumentVersions] // Ensure you have a repository for history
+	versionRepo   *repositories.Repository[models.DocumentVersions]
 }
 
 func NewDocumentsService(documentsRepo *repositories.Repository[models.Document], versionRepo *repositories.Repository[models.DocumentVersions]) *DocumentsService {
@@ -34,96 +34,86 @@ func (s *DocumentsService) GetDocuments(c *gin.Context, params *models.GetDocume
 	} else {
 		filter = map[string]interface{}{}
 	}
-
 	documents, err := s.documentsRepo.FindAllByFilter(filter, "Versions")
 	if err != nil {
-		// handle error
 		return nil, err
 	}
 	return documents, nil
 }
 
-// UpdateDocument updates the current document and creates a new DocumentHistory entry
+// UpdateDocument updates a document
 func (s *DocumentsService) UpdateDocument(c *gin.Context, ID string, document models.Document) error {
-	// Get the document by ID
 	documentID, err := strconv.Atoi(ID)
 	if err != nil {
-		return err // Return error if the ID is not a valid integer
+		return err
 	}
+
 	document.ID = uint(documentID)
-	// Step 1: Update the current document
 	if err := s.documentsRepo.Save(&document); err != nil {
-		return err // Return error if saving the document fails
+		return err
 	}
 	return nil
 }
 
 // CreateVersion creates a new version of the document
 func (s *DocumentsService) CreateVersion(c *gin.Context, ID string) error {
-	// Get the document by ID
 	document, err := s.documentsRepo.FindByFilter(map[string]interface{}{"id": ID}, "Versions")
 	if err != nil {
-		return err // Return error if the document is not found
+		return err
 	}
+
 	version := models.DocumentVersions{
-		DocumentID: document.ID, // Use the updated document ID
+		DocumentID: document.ID,
 		Version:    len(document.Versions) + 1,
 	}
-	// Step 2: Insert the history record
 	if err := s.versionRepo.Save(&version); err != nil {
-		return err // Return error if saving history fails
+		return err
 	}
 	return nil
 }
 
-// UpdateDocument updates the current document and creates a new DocumentHistory entry
+// UpdateVersion updates a document version
 func (s *DocumentsService) UpdateVersion(c *gin.Context, ID string, version models.DocumentVersions) error {
-
 	versionID, err := strconv.Atoi(ID)
 	if err != nil {
-		return err // Return error if the ID is not a valid integer
+		return err
 	}
+
 	version.ID = uint(versionID)
-	// Step 3: Insert the history record
 	if err := s.versionRepo.Save(&version); err != nil {
-		return err // Return error if saving history fails
+		return err
 	}
 
 	return nil
 }
 
-// Upload Document uploads a file and updates the document's path
+// Upload Document uploads a file to a document version and updates the document's path
 func (s *DocumentsService) UploadDocument(c *gin.Context, versionID string, file *multipart.FileHeader) error {
-	// Get the document by ID
 	version, err := s.versionRepo.FindByFilter(map[string]interface{}{"id": versionID})
 	if err != nil {
-		return err // Return error if the document is not found
+		return err
 	}
-
 	document, err := s.documentsRepo.FindByFilter(map[string]interface{}{"id": version.DocumentID})
 	if err != nil {
-		return err // Return error if the document is not found
+		return err
 	}
 
+	//  Save the file to the uploads directory
 	extension := filepath.Ext(file.Filename)
-
-	// Save the file to a local folder
 	savePath := filepath.Join("uploads", fmt.Sprint(document.Name)+"_"+fmt.Sprint(version.Version+1)+extension)
 	if err := c.SaveUploadedFile(file, savePath); err != nil {
-		return err // Return error if saving the file fails
+		return err
 	}
 
-	// Step 2: Create a new DocumentHistory entry
 	newVersion := models.DocumentVersions{
-		DocumentID: version.DocumentID,  // Use the updated document ID
-		Version:    version.Version + 1, // Function to determine the next version number
+		DocumentID: version.DocumentID,
+		Version:    version.Version + 1,
 		Path:       savePath,
 		Archived:   version.Archived,
 	}
 
-	// Step 3: Insert the history record
 	if err := s.versionRepo.Save(&newVersion); err != nil {
-		return err // Return error if saving history fails
+		return err
 	}
 
 	return nil
