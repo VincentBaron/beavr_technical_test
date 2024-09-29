@@ -66,7 +66,7 @@ export const RequirementTable: React.FC = () => {
                 className="text-lg font-semibold truncate cursor-pointer"
                 onClick={() => handleRequirementClick(req.ID)}
               >
-                {req.Name}
+                [{req.ID}] {req.Name}
               </h3>
               <p className="text-sm overflow-hidden text-ellipsis">
                 {req.Description}
