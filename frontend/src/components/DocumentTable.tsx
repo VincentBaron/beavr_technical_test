@@ -30,9 +30,15 @@ interface DocumentVersion {
   UpdatedAt: string;
 }
 
+interface DocumentTableProps {
+  referenceId: string | null;
+}
+
 const statuses = ["compliant", "non-compliant"];
 
-export const DocumentTable: React.FC = () => {
+export const DocumentTable: React.FC<DocumentTableProps> = ({
+  referenceId,
+}) => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [currentVersionId, setCurrentVersionId] = useState<number | null>(null);
@@ -43,11 +49,25 @@ export const DocumentTable: React.FC = () => {
     [key: number]: boolean;
   }>({});
 
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+
+  useEffect(() => {
+    if (referenceId) {
+      const initialShowDocuments: { [key: number]: boolean } = {};
+      documents.forEach((doc: Document) => {
+        initialShowDocuments[doc.RequirementID] =
+          doc.RequirementID.toString() === referenceId;
+      });
+      setShowDocuments(initialShowDocuments);
+    }
+  }, [referenceId, documents]);
+
   const fetchDocuments = async () => {
     const response = await getDocuments();
     setDocuments(response.data.documents);
 
-    // Initialize showDocuments state with the first three RequirementIDs set to true
     const initialShowDocuments: { [key: number]: boolean } = {};
     const sortedDocs = response.data.documents.sort(
       (a: Document, b: Document) => a.RequirementID - b.RequirementID
@@ -57,10 +77,6 @@ export const DocumentTable: React.FC = () => {
     });
     setShowDocuments(initialShowDocuments);
   };
-
-  useEffect(() => {
-    fetchDocuments();
-  }, []);
 
   const handleStatusChange = async (documentId: number, status: string) => {
     const document = documents.find((doc) => doc.ID === documentId);
@@ -124,10 +140,11 @@ export const DocumentTable: React.FC = () => {
     }));
   };
 
-  // Sort documents by RequirementID
-  const sortedDocuments = [...documents].sort(
-    (a, b) => a.RequirementID - b.RequirementID
-  );
+  const sortedDocuments = [...documents].sort((a, b) => {
+    if (referenceId && a.RequirementID.toString() === referenceId) return -1;
+    if (referenceId && b.RequirementID.toString() === referenceId) return 1;
+    return a.RequirementID - b.RequirementID;
+  });
 
   return (
     <div className="space-y-4">
@@ -146,6 +163,7 @@ export const DocumentTable: React.FC = () => {
                 <h2 className="text-xl font-bold">
                   Requirement ID: {requirementId}
                 </h2>
+                <h3>Documents 👇</h3>
                 <Button onClick={() => toggleShowDocuments(requirementId)}>
                   {showDocuments[requirementId]
                     ? "Hide Documents"
