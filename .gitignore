@@ -6,3 +6,6 @@ frontend/.env
 csvToSQL.go
 scripts/
 backend/uploads/
+test.sh
+beavrdump.sql
+launch.sh
